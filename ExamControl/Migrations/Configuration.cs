@@ -1,6 +1,7 @@
 namespace ExamControl.Migrations
 {
     using System;
+    using System.Collections.Generic;
     using System.Data.Entity.Migrations;
     using System.Linq;
     using ExamControl.Domain;
@@ -30,36 +31,81 @@ namespace ExamControl.Migrations
         {
             CreateRoles(context);
 
-            CreateUsers(context);
+            CreateStaffUsers(context);
+
+            IEnumerable<AppUser> students = CreateStudents(context);
+
+            CreateOthers(context, students);
+        }
+
+        private IEnumerable<AppUser> CreateStudents(AppDbContext context)
+        {
+            if (!context.Users.Any(u => !string.IsNullOrEmpty(u.StudentNumber)))
+            {
+                var store = new UserStore<AppUser>(context);
+                var manager = new UserManager<AppUser>(store);
+
+                var userList = new AppUser[]
+                {
+                    new AppUser
+                    {
+                        Name = "Stephanie",
+                        StudentNumber = "002119031",
+                        UserName = "stephanie@examcontrol.com"
+                    },
+                    new AppUser
+                    {
+                        Name = "Koen",
+                        StudentNumber = "002119032",
+                        UserName = "koen@examcontrol.com"
+                    },
+                    new AppUser
+                    {
+                        Name = "Freek",
+                        StudentNumber = "002119033",
+                        UserName = "freek@examcontrol.com"
+                    },
+                    new AppUser
+                    {
+                        Name = "Arie",
+                        StudentNumber = "002119034",
+                        UserName = "arie@examcontrol.com"
+                    },
+                    new AppUser
+                    {
+                        Name = "Frank",
+                        StudentNumber = "002119035",
+                        UserName = "frank@examcontrol.com"
+                    }
+                };
+
+                foreach (var user in userList)
+                {
+                    manager.Create(user, "22INF2A");
+                    manager.AddToRole(user.Id, "Student");
+                }
+
+                return userList;
+            }
+
+            return Enumerable.Empty<AppUser>();
         }
 
         /// <summary>
         /// The CreateUsers
         /// </summary>
         /// <param name="context">The <see cref="AppDbContext"/></param>
-        private static void CreateUsers(AppDbContext context)
+        private static void CreateStaffUsers(AppDbContext context)
         {
             var store = new UserStore<AppUser>(context);
             var manager = new UserManager<AppUser>(store);
-
-            if (!context.Users.Any(u => u.UserName == "admin@examcontrol.com"))
-            {
-                var user = new AppUser
-                {
-                    UserName = "admin@examcontrol.com",
-                    Country = "The Netherlands"
-                };
-
-                manager.Create(user, "22INF2A");
-                manager.AddToRole(user.Id, "AppAdmin");
-            }
 
             if (!context.Users.Any(u => u.UserName == "administratie@examcontrol.com"))
             {
                 var user = new AppUser
                 {
-                    UserName = "administratie@examcontrol.com",
-                    Country = "The Netherlands"
+                    Name = "Administratie",
+                    UserName = "administratie@examcontrol.com"
                 };
 
                 manager.Create(user, "22INF2A");
@@ -70,24 +116,12 @@ namespace ExamControl.Migrations
             {
                 var user = new AppUser
                 {
-                    UserName = "docent@examcontrol.com",
-                    Country = "The Netherlands"
+                    Name = "Maurice van Haperen",
+                    UserName = "docent@examcontrol.com"
                 };
 
                 manager.Create(user, "22INF2A");
                 manager.AddToRole(user.Id, "Teacher");
-            }
-
-            if (!context.Users.Any(u => u.UserName == "student@examcontrol.com"))
-            {
-                var user = new AppUser
-                {
-                    UserName = "student@examcontrol.com",
-                    Country = "The Netherlands"
-                };
-
-                manager.Create(user, "22INF2A");
-                manager.AddToRole(user.Id, "Student");
             }
         }
 
@@ -100,15 +134,6 @@ namespace ExamControl.Migrations
             // Users
             var store = new RoleStore<IdentityRole>(context);
             var manager = new RoleManager<IdentityRole>(store);
-
-            if (!context.Roles.Any(r => r.Name == "AppAdmin"))
-            {
-                manager.Create(
-                    new IdentityRole
-                    {
-                        Name = "AppAdmin"
-                    });
-            }
 
             if (!context.Roles.Any(r => r.Name == "Admin"))
             {
@@ -136,24 +161,45 @@ namespace ExamControl.Migrations
                         Name = "Student"
                     });
             }
+        }
 
+        private static void CreateOthers(AppDbContext ctx, IEnumerable<AppUser> students)
+        {
             // Subjects, exams and registrations
-            if (!context.Subjects.Any() && !context.Exams.Any())
+            if (!ctx.Subjects.Any() && !ctx.Exams.Any())
             {
-                var subjectEnglish = new Subject()
+                var subjects = new Subject[]
                 {
-                    Name = "Engels"
+                    new Subject("Engels"),
+                    new Subject("RUP"),
+                    new Subject("C#")
                 };
 
-                var examEnglish = new Exam()
+                var r = new Random();
+
+                foreach (var sub in subjects)
                 {
-                    Subject = subjectEnglish,
-                    DateTime = DateTime.Now.AddDays(7)
-                };
+                    var classroom = new Classroom(16, true, "ABC");
+                    ctx.Classrooms.Add(classroom);
 
-                context.Subjects.Add(subjectEnglish);
+                    ctx.Subjects.Add(sub);
 
-                context.Exams.Add(examEnglish);
+                    var exams = new Exam[]
+                    {
+                        new Exam(DateTime.Now.AddDays(7), sub, 15, classroom, true, true, new TimeSpan(1, 30, 0)),
+                        new Exam(DateTime.Now.AddDays(7).AddHours(6), sub, 15, classroom, true, true, new TimeSpan(1, 30, 0)),
+                        new Exam(DateTime.Now.AddDays(7).AddHours(3), sub, 15, classroom, true, true, new TimeSpan(1, 30, 0)),
+                    };
+
+                    ctx.Exams.Add(exams.ElementAt(r.Next() % 3));
+
+                    //foreach (var s in students)
+                    //{
+                    //    var reg = new ExamRegistration(ex, s.Id, DateTime.Now);
+
+                    //    ctx.ExamRegistrations.Add(reg);
+                    //}
+                }
             }
         }
     }

@@ -1,26 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.IO;
-using System.Linq;
 using System.Web;
-using System.Web.Mvc;
 
 namespace ExamControl.Models.Exam
 {
     public class InsertExamModel
     {
-        public bool ClassroomHasComputers { get; set; }
+        [Display(Name = "Computerlokaal benodigd")]
+        public bool ExamNeedsComputers { get; set; }
 
         [Required]
-        public uint EstimatedAmountOfStudents { get; set; }
+        [Display(Name = "Aantal studenten")]
+        public int EstimatedAmountOfStudents { get; set; }
 
         [Required]
+        [Display(Name = "Uploaden")]
         public HttpPostedFileBase File { get; set; }
 
-        public bool ExamRegistrationSurveillantAvailable { get; set; }
+        [Display(Name = "Surveillant beschikbaar")]
+        public bool ExamSurveillantAvailable { get; set; }
 
         [Required]
-        public int ExamSubject { get; set; }
+        [Display(Name = "Selecteer Vak")]
+        public int SelectedExamSubject { get; set; }
+
+        [Required]
+        [Display(Name = "Tijdsduur benodigd (min)")]
+        public int ExamDuration { get; set; }
     }
 }

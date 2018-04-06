@@ -1,0 +1,34 @@
+﻿@model ExamControl.Models.Exam.OverviewTeacherModel
+
+@{
+    ViewBag.Title = "OverviewTeacher";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Overzicht Ingevoerde Tentamen</h2>
+
+<table class="table table-striped table-dark">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Vak</th>
+            <th scope="col">Aantal studenten</th>
+            <th scope="col">Surveillant beschikbaar</th>
+            <th scope="col">Computerlokaal benodigd</th>
+            <th scope="col">Tijdsduur benodigd</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var exam in Model.Exams)
+        {
+        <tr>
+            <td>@Html.DisplayFor(m => exam.SubjectId)</td>
+            <td>@Html.DisplayFor(m => exam.SubjectName)</td>
+            <td>@Html.DisplayFor(mbox => exam.ExamEstimatedAmountOfStudents)</td>
+            <td>@Html.DisplayFor(mbox => exam.ExamSurveillantAvailable)</td>
+            <td>@Html.DisplayFor(m => exam.ExamNeedsComputers)</td>
+            <td>@Html.DisplayFor(mbox => exam.ExamDuration)</td>
+        </tr>
+        }
+    </tbody>
+</table>
