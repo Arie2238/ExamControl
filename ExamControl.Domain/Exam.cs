@@ -1,7 +1,6 @@
 ﻿namespace ExamControl.Domain
 {
     using System;
-    using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
 
     /// <summary>
@@ -9,6 +8,22 @@
     /// </summary>
     public class Exam
     {
+        public Exam()
+        {
+
+        }
+
+        public Exam(DateTime? dateTime, Subject subject, int estimatedAmountOfStudents, Classroom classroom, bool needsComputers, bool surveillantAvailable, TimeSpan duration)
+        {
+            DateTime = dateTime;
+            Subject = subject;
+            EstimatedAmountOfStudents = estimatedAmountOfStudents;
+            Classroom = classroom;
+            NeedsComputers = needsComputers;
+            SurveillantAvailable = surveillantAvailable;
+            Duration = duration;
+        }
+
         /// <summary>
         /// Gets or sets the Id
         /// </summary>
@@ -28,11 +43,14 @@
         /// <summary>
         /// Gets or sets the EstimatedAmountOfStudents
         /// </summary>
-        public uint EstimatedAmountOfStudents { get; set; }
+        public int EstimatedAmountOfStudents { get; set; }
 
-        /// <summary>
-        /// Gets or sets the Attributes
-        /// </summary>
-        public KeyValuePair<string, string> Attributes { get; set; }
+        public Classroom Classroom { get; set; }
+
+        public bool NeedsComputers { get; set; }
+
+        public bool SurveillantAvailable { get; set; }
+
+        public TimeSpan Duration { get; set; }
     }
 }

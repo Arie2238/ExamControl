@@ -8,11 +8,14 @@
 </head>
 <body>
     <div class="container">
-        <ul class="nav justify-content-end">
-            <li class="nav-item">
-                @Html.ActionLink("Uitloggen", "LogOut", "Auth", null, new { @class = "nav-link float-right" })
-            </li>
-        </ul>
+        @if (CurrentUser.Identity.IsAuthenticated)
+        {
+            <ul class="nav justify-content-end">
+                <li class="nav-item">
+                    @Html.ActionLink("Uitloggen", "LogOut", "Auth", null, new { @class = "nav-link float-right" })
+                </li>
+            </ul>
+        }
         <h1>ExamControl - Hogeschool Uithuizermeeden</h1>
         @if (CurrentUser.Identity.IsAuthenticated)
         {
@@ -20,13 +23,18 @@
                 <li class="nav-item">
                     @Html.ActionLink("Home", "Index", "Home", null, new { @class = "nav-link" })
                 </li>
-                <li class="nav-item">
-                    @Html.ActionLink("Plannen", "Index", "Plan", null, new { @class = "nav-link" })
-                </li>
+                @if (CurrentUser.IsInRole("Admin"))
+                {
+                    <li class="nav-item">
+                        @Html.ActionLink("Plannen", "Index", "Plan", null, new { @class = "nav-link" })
+                    </li>
+                }
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Examens</a>
                     <div class="dropdown-menu">
-                        @if (CurrentUser.IsInRole("Admin"))
+                        @Html.ActionLink("Overzicht", "Overview", "Exam", null, new { @class = "nav-link" })
+
+                        @if (CurrentUser.IsInRole("Teacher"))
                         {
                             @Html.ActionLink("Invoeren cijfers", "InsertGrades", "Exam", null, new { @class = "nav-link" })
                         }
