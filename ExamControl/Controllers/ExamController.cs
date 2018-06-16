@@ -1,5 +1,8 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 using ExamControl.Domain;
 using ExamControl.Models;
@@ -91,7 +94,7 @@ namespace ExamControl.Controllers
             return RedirectToAction("InsertExam");
         }
         [HttpPost]
-        public async Task<JsonResult> UploadHomeReport(string id)
+        public JsonResult UploadHomeReport(string id)
         {
             try
             {
@@ -102,10 +105,11 @@ namespace ExamControl.Controllers
                     {
                         // get a stream
                         var stream = fileContent.InputStream;
+
                         // and optionally write the file to disk
                         var fileName = Path.GetFileName(file);
                         var path = Path.Combine(Server.MapPath("~/App_Data/Images"), fileName);
-                        using (var fileStream = File.Create(path))
+                        using (var fileStream = System.IO.File.Create(path))
                         {
                             stream.CopyTo(fileStream);
                         }
